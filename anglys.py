@@ -39,4 +39,6 @@ if __name__ == '__main__':
     else:
         video_input = sys.argv[sys.argv.index('-i')+1]
         model_path = sys.argv[sys.argv.index('-m')+1]
-        main(video_input=video_input, model_path=model_path)
+        video_output = sys.argv[sys.argv.index('-o')+1] if '-o' in sys.argv else "output.avi"
+        pdf_output = sys.argv[sys.argv.index('-o')+1] if '-p' in sys.argv else "anglys_plots.pdf"
+        main(video_input=video_input, model_path=model_path, video_output=video_output, pdf_output=pdf_output)
