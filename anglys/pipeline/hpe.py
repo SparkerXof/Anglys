@@ -1,6 +1,6 @@
 import cv2 as cv
-from src.video import VideoInput
-from src.model.blazepose import BlazePoseModel
+from pipeline.video import VideoInput
+from pipeline.model.blazepose import BlazePoseModel
 from tqdm import tqdm
 import json
 
@@ -23,4 +23,5 @@ class HumanPoseEstimation:
                 result.append(pose)
             else:
                 result = []
+        print("Processed frames:", len(result))
         return result

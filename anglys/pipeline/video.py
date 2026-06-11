@@ -12,7 +12,7 @@ class VideoInput:
         self.frametime = int((1/self.framerate)*1000)
         self.total_frames = int(self.cap.get(cv.CAP_PROP_FRAME_COUNT))
         self.resolution = (int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)))
-        self.output = cv.VideoWriter(out, cv.VideoWriter_fourcc(*"XVID"), 25.0, self.resolution)
+        self.output = cv.VideoWriter(out, cv.VideoWriter_fourcc(*"mp4v"), 25.0, self.resolution)
     def write_data(self):
         print("=== Input video data ===")
         print(f"Resolution: {self.resolution}")

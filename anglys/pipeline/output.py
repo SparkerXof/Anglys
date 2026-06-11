@@ -1,0 +1,79 @@
+import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
+KEYPOINTS_NAMES = ["Левая нога. Тазобедренный сустав", 
+                    "Левая нога. Коленный сустав", 
+                    "Левая нога. Голеностопный сустав", 
+                    "Правая нога. Тазобедренный сустав", 
+                    "Правая нога. Коленный сустав", 
+                    "Правая нога. Голеностопный сустав",]
+
+class Output:
+    def run(self, raw_pose_timeline, filtered_pose_timeline, 
+            left_leg_phases, right_leg_phases, angles_timeline, 
+            left_leg_velocity_phases, right_leg_velocity_phases, 
+            video, pdf_output):
+        print("=== Estimation output ===")
+        timeline_lenght = len(filtered_pose_timeline)
+
+        with PdfPages(pdf_output) as pdf:
+            idx = 0
+            for phase, velocity in zip(left_leg_phases, left_leg_velocity_phases):
+                plt.figure()
+                fig, ax = plt.subplots(1, 2)
+                for ph in phase:
+                    ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(ph), color='g', linewidth=0.5)
+                ax[0].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
+                ax[0].set_xlim(0, 100)
+                ax[0].set_xlabel("Цикл ходьбы, %")
+                ax[0].set_ylabel("Угол сгибания, °")
+                for v in velocity:
+                    ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(v), color='b', linewidth=0.5)
+                ax[1].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
+                ax[1].set_xlim(0, 100)
+                ax[1].set_xlabel("Цикл ходьбы, %")
+                ax[1].set_ylabel("Угловая скорость, °/с")
+                fig.suptitle(KEYPOINTS_NAMES[idx])
+                fig.set_figwidth(12)
+                fig.set_figheight(6)
+                pdf.savefig()
+                plt.close()
+                idx += 1
+            for phase, velocity in zip(right_leg_phases, right_leg_velocity_phases):
+                plt.figure()
+                fig, ax = plt.subplots(1, 2)
+                for ph in phase:
+                    ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(ph), color='g', linewidth=0.5)
+                ax[0].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
+                ax[0].set_xlim(0, 100)
+                ax[0].set_xlabel("Цикл ходьбы, %")
+                ax[0].set_ylabel("Угол сгибания, °")
+                for v in velocity:
+                    ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(v), color='b', linewidth=0.5)
+                ax[1].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
+                ax[1].set_xlim(0, 100)
+                ax[1].set_xlabel("Цикл ходьбы, %")
+                ax[1].set_ylabel("Угловая скорость, °/с")
+                fig.suptitle(KEYPOINTS_NAMES[idx])
+                fig.set_figwidth(12)
+                fig.set_figheight(6)
+                pdf.savefig()
+                plt.close()
+                idx += 1
+        
+        i = 0
+        estimation_start = video.total_frames-timeline_lenght
+        video.cap = cv.VideoCapture(video.filepath)
+        while True:
+            ret, frame = video.cap.read()
+            if not ret:
+                break
+            if i > estimation_start:
+                for j in range(len(filtered_pose_timeline[0])):
+                    cv.circle(frame, (int(video.resolution[0]*filtered_pose_timeline[i-estimation_start][j][0]), int(video.resolution[1]*filtered_pose_timeline[i-estimation_start][j][1])), 5, (0,255,0), -1)
+                for idx, j in enumerate([1, 2, 3, 7, 8, 9]):
+                    cv.putText(frame, str(np.rad2deg(angles_timeline[i-estimation_start][idx])), (int(video.resolution[0]*filtered_pose_timeline[i-estimation_start][j][0]), int(video.resolution[1]*filtered_pose_timeline[i-estimation_start][j][1])), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv.LINE_AA)
+            video.output.write(frame)
+            i += 1

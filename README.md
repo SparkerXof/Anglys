@@ -19,13 +19,25 @@
 
 ## Установка
 
+### Консольное приложение
 Программа является консольным приложением, требующим Python 3.14+. Установка зависимостей производится с помощью
 ```
 pip install -r requirement.txt
 ```
 
-## Использование
+### GUI приложение
+Также у приложения есть GUI версия, которую можно собрать с помощью pyinstaller. Однако помимо библиотек из requirement.txt потребуются следующие действия:
 
+```
+pip install pyinstaller
+cd anglys
+pyinstaller Anglys.spec
+```
+В Releases существует готовый бинарный файл для Linux.
+
+## Использование
+![alt text](docs/image.png)
+Данный текст помощи предоставлен для консольного приложения. В GUI флаги выведены в виде полей.
 ```
 Usage: python anglys.py [options] -i <input> -o <video_output> -p <pdf_output> -m <model_path>
 

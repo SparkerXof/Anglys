@@ -9,6 +9,7 @@ POSE_LANDMARKS = mp.tasks.vision.PoseLandmarksConnections.POSE_LANDMARKS
 NormalizedLandmark = mp.tasks.components.containers.NormalizedLandmark
 
 LEGS_LANDMARKS = [11, 23, 25, 27, 29, 31, 12, 24, 26, 28, 30, 32]
+FAST_LANDMARKS = [25, 27, 29, 31, 26, 28, 30, 32]
 
 class BlazePoseModel:
     def __init__(self, model_path: str, detection_confidence: float = 0.5):
@@ -25,7 +26,7 @@ class BlazePoseModel:
         pose = []
         if len(pose_landmarks) > 0:
             for p_id in LEGS_LANDMARKS:
-                if pose_landmarks[0][p_id].visibility >= self.options.min_pose_detection_confidence or empty:
+                if not (p_id in FAST_LANDMARKS) or (pose_landmarks[0][p_id].visibility > 0.6) or empty:
                     pose.append([pose_landmarks[0][p_id].x, pose_landmarks[0][p_id].y, pose_landmarks[0][p_id].z])
                 else:
                     pose.append([])
