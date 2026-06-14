@@ -23,14 +23,14 @@ class Output:
             for phase, velocity in zip(left_leg_phases, left_leg_velocity_phases):
                 plt.figure()
                 fig, ax = plt.subplots(1, 2)
-                for ph in phase:
-                    ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(ph), color='g', linewidth=0.5)
+                avg_phase = np.mean(phase, axis=0)
+                ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(avg_phase), color='g')
                 ax[0].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
                 ax[0].set_xlim(0, 100)
                 ax[0].set_xlabel("Цикл ходьбы, %")
                 ax[0].set_ylabel("Угол сгибания, °")
-                for v in velocity:
-                    ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(v), color='b', linewidth=0.5)
+                avg_velocity = np.mean(velocity, axis=0)
+                ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(avg_velocity), color='b')
                 ax[1].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
                 ax[1].set_xlim(0, 100)
                 ax[1].set_xlabel("Цикл ходьбы, %")
@@ -44,14 +44,14 @@ class Output:
             for phase, velocity in zip(right_leg_phases, right_leg_velocity_phases):
                 plt.figure()
                 fig, ax = plt.subplots(1, 2)
-                for ph in phase:
-                    ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(ph), color='g', linewidth=0.5)
+                avg_phase = np.mean(phase, axis=0)
+                ax[0].plot(np.linspace(0, 100, 100), np.rad2deg(avg_phase), color='g')
                 ax[0].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
                 ax[0].set_xlim(0, 100)
                 ax[0].set_xlabel("Цикл ходьбы, %")
                 ax[0].set_ylabel("Угол сгибания, °")
-                for v in velocity:
-                    ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(v), color='b', linewidth=0.5)
+                avg_velocity = np.mean(velocity, axis=0)
+                ax[1].plot(np.linspace(0, 100, 100), np.rad2deg(avg_velocity), color='b')
                 ax[1].plot(np.linspace(0, 100, 100), [0]*100, color='gray', linewidth=0.5, linestyle='--')
                 ax[1].set_xlim(0, 100)
                 ax[1].set_xlabel("Цикл ходьбы, %")
