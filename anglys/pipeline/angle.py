@@ -2,44 +2,52 @@ import numpy as np
 
 class Angles:
     def scalar(self, a, b):
-        if len(a) == 3 and len(b) == 3:
-            return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
-        raise ValueError("Point is not 3d")
-    def lenght(self, a):
-        if len(a) == 3:
-            return np.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
-        raise ValueError("Point is not 3d")
-    def side(self, a, b):
-        cross = np.cross(a, b)
-        if cross[2] > 0:
-            return 1
-        return -1
+        if len(a) == len(b):
+            return np.dot(a, b)
+    def length(self, a):
+        return np.linalg.norm(a)
+    def angle_between(self, v1, v2):
+        cos_angle = self.scalar(v1, v2) / (self.length(v1) * self.length(v2) + 1e-8)
+        cos_angle = np.clip(cos_angle, -1.0, 1.0)
+        return np.arccos(cos_angle)
+    def get_2d_vector(self, p1, p2):
+        return np.array([p2[0] - p1[0], p2[1] - p1[1]])
+    def joint_angle(self, p_prev, p_center, p_next):
+        v1 = self.get_2d_vector(p_center, p_prev)
+        v2 = self.get_2d_vector(p_center, p_next)
+        angle = self.angle_between(v1, v2)
+        cross = v1[0] * v2[1] - v1[1] * v2[0]
+        
+        return angle if cross >= 0 else -angle
+
+    def calc_angles(self, p):
+        torso_up = self.get_2d_vector(p[0], p[1])
+        thigh = self.get_2d_vector(p[1], p[2])
+        hip_angle = self.angle_between(torso_up, thigh)
+        cross = torso_up[0]*thigh[1] - torso_up[1]*thigh[0]
+        hip_angle = hip_angle*np.sign(cross)
+
+        thigh_vec = self.get_2d_vector(p[2], p[1])
+        shin_vec = self.get_2d_vector(p[3], p[2])
+        knee_angle = self.angle_between(thigh_vec, shin_vec)
+
+        shin_vec = self.get_2d_vector(p[3], p[2])
+        shin_vec = shin_vec / self.length(shin_vec)
+        foot_vec = self.get_2d_vector(p[5], p[4])
+        foot_len = self.length(foot_vec)
+        foot_dir = foot_vec / foot_len
+        perp_to_shin = np.array([-shin_vec[1], shin_vec[0]])
+        foot_proj = self.scalar(foot_dir, perp_to_shin)
+        foot_vert = self.scalar(foot_dir, shin_vec)
+        ankle_angle = np.arctan2(foot_vert, foot_proj)
+        
+        return [hip_angle, knee_angle, ankle_angle]
 
     def run(self, points_timeline):
         angles_timeline = []
         for P in points_timeline:
-            V = [
-                np.subtract(P[1], P[0]),
-                np.subtract(P[2], P[1]),
-                np.subtract(P[3], P[2]),
-                np.subtract(P[5], P[4]),
-                np.subtract(P[7], P[6]),
-                np.subtract(P[8], P[7]),
-                np.subtract(P[9], P[8]),
-                np.subtract(P[11], P[10])
-            ]
-            left_lat = np.cross(V[3], V[2])
-            left_up_foot = np.cross(left_lat, V[3])
-            right_lat = np.cross(V[7], V[6])
-            right_up_foot = np.cross(right_lat, V[7])
-            angles = [
-                np.sign(V[3][0])*-1*self.side(V[0], V[1])*np.arccos((self.scalar(V[0], V[1]))/(self.lenght(V[0])*self.lenght(V[1]))),
-                np.sign(V[3][0])*self.side(V[1], V[2])*np.arccos((self.scalar(V[1], V[2]))/(self.lenght(V[1])*self.lenght(V[2]))),
-                np.sign(V[3][0])*-1*self.side(V[2], left_up_foot)*np.arccos((self.scalar(V[2], left_up_foot))/(self.lenght(V[2])*self.lenght(left_up_foot))),
-                np.sign(V[3][0])*-1*self.side(V[4], V[5])*np.arccos((self.scalar(V[4], V[5]))/(self.lenght(V[4])*self.lenght(V[5]))),
-                np.sign(V[3][0])*self.side(V[5], V[6])*np.arccos((self.scalar(V[5], V[6]))/(self.lenght(V[5])*self.lenght(V[6]))),
-                np.sign(V[3][0])*-1*self.side(V[6], right_up_foot)*np.arccos((self.scalar(V[6], right_up_foot))/(self.lenght(V[6])*self.lenght(right_up_foot))),
-            ]
-            angles_timeline.append(angles)
+            left = self.calc_angles(P[:6])
+            right = self.calc_angles(P[6:])
+            angles_timeline.append(np.concatenate((left, right), axis=None))
         return angles_timeline
 

@@ -24,12 +24,14 @@ class BlazePoseModel:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
         pose_landmarks = self.landmarker.detect_for_video(mp_image, frame_id*frametime).pose_landmarks
         pose = []
+        raw_pose = []
         if len(pose_landmarks) > 0:
             for p_id in LEGS_LANDMARKS:
                 if not (p_id in FAST_LANDMARKS) or (pose_landmarks[0][p_id].visibility > 0.6) or empty:
                     pose.append([pose_landmarks[0][p_id].x, pose_landmarks[0][p_id].y, pose_landmarks[0][p_id].z])
                 else:
                     pose.append([])
+                raw_pose.append([pose_landmarks[0][p_id].x, pose_landmarks[0][p_id].y, pose_landmarks[0][p_id].z])
         else:
-            return None
-        return pose
+            return None, None
+        return pose, raw_pose

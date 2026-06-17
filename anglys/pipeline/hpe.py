@@ -14,14 +14,23 @@ class HumanPoseEstimation:
     def run(self, video: VideoInput):
         print("=== Estimating human pose on video ===")
         result = []
+        raw_results = []
+        empty = True
+        start = 0
         for i in tqdm(range(video.total_frames)):
             ret, frame = video.cap.read()
             if not ret:
                 break
-            pose = self.model.estimate(frame, i, video.frametime, len(result) <= 0)
+            pose, raw_pose = self.model.estimate(frame, i, video.frametime, empty)
             if pose:
+                if empty:
+                    start = i
+                    result = []
+                    raw_results = []
                 result.append(pose)
+                raw_results.append(raw_pose)
+                empty = False
             else:
-                result = []
+                empty = True
         print("Processed frames:", len(result))
-        return result
+        return start, result, raw_results

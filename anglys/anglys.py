@@ -16,14 +16,21 @@ def main(video_input: str, model_path: str, video_output: str = "output.avi", pd
     output = Output()
 
     video.write_data()
-    raw_pose_timeline = hpe.run(video)
+    start, raw_pose_timeline, bad_pose_timeline = hpe.run(video)
+
     filtered_pose_timeline = postprocess.run_3d(raw_pose_timeline, video.frametime)
     angles_timeline = angles.run(filtered_pose_timeline)
     velocity_timeline = parameters.get_velocities(angles_timeline, video.framerate)
     left_leg_phases, left_leg_velocity_phases, right_leg_phases, right_leg_velocity_phases = parameters.split_to_phases(angles_timeline, velocity_timeline, video.framerate)
+
+    bad_angles_timeline = angles.run(bad_pose_timeline)
+    bad_velocity_timeline = parameters.get_velocities(bad_angles_timeline, video.framerate)
+    bad_left_leg_phases, bad_left_leg_velocity_phases, bad_right_leg_phases, bad_right_leg_velocity_phases = parameters.split_to_phases(bad_angles_timeline, bad_velocity_timeline, video.framerate)
+
     output.run(raw_pose_timeline, filtered_pose_timeline, 
                 left_leg_phases, right_leg_phases, angles_timeline, 
-                left_leg_velocity_phases, right_leg_velocity_phases, 
+                left_leg_velocity_phases, right_leg_velocity_phases, start,
+                bad_left_leg_phases, bad_right_leg_phases,
                 video, pdf_output)
 
     video.cap.release()
