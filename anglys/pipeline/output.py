@@ -85,13 +85,3 @@ class Output:
                     cv.putText(frame, str(np.round(np.rad2deg(angles_timeline[i-estimation_start][idx]), 2)), (int(video.resolution[0]*filtered_pose_timeline[i-estimation_start][j][0]), int(video.resolution[1]*filtered_pose_timeline[i-estimation_start][j][1])), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv.LINE_AA)
             video.output.write(frame)
             i += 1
-        with PdfPages("test_1.pdf") as pdf:
-            timeline = np.array(angles_timeline).T
-            plt.figure()
-            plt.plot(timeline[3], color='g')
-            pdf.savefig()
-            plt.close()
-            plt.figure()
-            plt.plot(timeline[3], color='g')
-            pdf.savefig()
-            plt.close()

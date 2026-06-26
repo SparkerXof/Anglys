@@ -5,7 +5,7 @@ from scipy import interpolate
 DISTANCE = 20
 
 class KeyParameters:
-    def get_velocities(self, angles_timeline, framerate):
+    def get_velocities(self, angles_timeline):
         velocity_timeline = [[0 for i in range(len(angles_timeline[0]))]]
 
         for i in range(len(angles_timeline)):
